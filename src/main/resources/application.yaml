@@ -5,6 +5,12 @@ unisinos:
       client-id: 1
       user: pedro
       password: viegas@123
+    fog-server:
+      mqtt:
+        server-url: tcp://localhost:1883
+        client-id: 2
+        user: pedro
+        password: viegas@123
 
 spring:
   application:

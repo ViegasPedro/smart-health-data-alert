@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.event.EventListener;
 
 import com.unisinos.smart_health_data_alert.commons.SmartHealthDataProperties;
-import com.unisinos.smart_health_data_alert.vital_sign.mqtt.MqttClient;
+import com.unisinos.smart_health_data_alert.commons.mqtt.MqttClient;
 
 @SpringBootApplication
 @EnableConfigurationProperties(value = { SmartHealthDataProperties.class })
