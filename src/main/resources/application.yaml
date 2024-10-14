@@ -2,13 +2,13 @@ unisinos:
   smart-health-data:
     mqtt:
       server-url: tcp://localhost:1883
-      client-id: 1
+      client-id: node1
       user: pedro
       password: viegas@123
     fog-server:
       mqtt:
         server-url: tcp://localhost:1883
-        client-id: 2
+        client-id: node2
         user: pedro
         password: viegas@123
 

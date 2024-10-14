@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.unisinos.smart_health_data_alert.vital_sign.model.VitalSign;
 import com.unisinos.smart_health_data_alert.vital_sign.service.VitalSignService;
 
@@ -38,10 +39,13 @@ public class VitalSignSubscriber implements IMqttMessageListener {
 		public void run() {
 			System.out.println("Thread [ " + Thread.currentThread().getName() + "], Topic[ " + topic + "],  Message ["
 					+ message + "] ");
+			Gson gson = new GsonBuilder()
+					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+					.create();
 			
 			JSONObject json =new JSONObject(new String(message.getPayload()));
-			VitalSign vitalSign = new Gson().fromJson(json.toString(), VitalSign.class);
-			
+			VitalSign vitalSign = gson.fromJson(json.toString(), VitalSign.class);
+						
 			vitalSignService.processMessage(vitalSign);
 		}
 	}

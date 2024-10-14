@@ -24,6 +24,7 @@ public class SmartHealthDataAlertApplication {
 	@EventListener(ApplicationReadyEvent.class)
 	public void startMqttClient() {
 	    this.mqttClient.getClient();
+	    this.mqttClient.getFogServerClient();
 	}
 
 }

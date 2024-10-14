@@ -46,7 +46,7 @@ public class MqttClient {
             Thread.sleep(1000);
             
             if (client.isConnected()) {
-            	client.subscribe(MqttTopicUtils.VITAL_SIGN_TOPIC, 1, subscriber);
+            	client.subscribe(MqttTopicUtils.EDGE_VITAL_SIGN_TOPIC, 1, subscriber);
             }
             this.client = client;
         } catch (Exception e) {
@@ -60,6 +60,7 @@ public class MqttClient {
         options.setPassword(this.properties.getFogServer().getMqtt().getPassword().toCharArray());
         options.setCleanSession(true);
         options.setKeepAliveInterval(30);
+        options.setMaxInflight(1000);
         
         try {
             MqttAsyncClient client = new MqttAsyncClient(this.properties.getFogServer().getMqtt().getServerUrl(), 

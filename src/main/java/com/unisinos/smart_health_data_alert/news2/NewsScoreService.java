@@ -1,5 +1,6 @@
 package com.unisinos.smart_health_data_alert.news2;
 
+import com.unisinos.smart_health_data_alert.vital_sign.model.InvalidVitalSignValueException;
 import com.unisinos.smart_health_data_alert.vital_sign.model.VitalSign;
 import com.unisinos.smart_health_data_alert.vital_sign.model.VitalSignType;
 
@@ -11,15 +12,31 @@ public class NewsScoreService {
 	
 	public static int calculateNewsScore(VitalSign vitalSign) {
 		if (vitalSign.getType() == VitalSignType.TEMPERATURE) {
-			return getTemperatureScore(Integer.valueOf(vitalSign.getValue()));
+			return getTemperatureScore(Double.valueOf(vitalSign.getValue()));
 		}
-		//TODO fazer para todos os tipos de sinal vital
-		return 0;
+		if (vitalSign.getType() == VitalSignType.HEARTRATE) {
+			return getHeartRateScore(Integer.valueOf(vitalSign.getValue()));
+		}
+		if (vitalSign.getType() == VitalSignType.BLOODPRESSURE) {
+			return getBloodPressureScore(Integer.valueOf(vitalSign.getValue()));
+		}
+		if (vitalSign.getType() == VitalSignType.OXYGEN) {
+			return getOxygenScore(vitalSign.getValue());
+		}
+		if (vitalSign.getType() == VitalSignType.CONSCIOUSNESS) {
+			return getConsciousnessScore(vitalSign.getValue());
+		}
+		if (vitalSign.getType() == VitalSignType.RESPIRATIONRATE) {
+			return getRespirationRateScore(Integer.valueOf(vitalSign.getValue()));
+		}
+		if (vitalSign.getType() == VitalSignType.SPO2) {
+			return getSpo2Score(Integer.valueOf(vitalSign.getValue()));
+		}
+		throw new InvalidVitalSignValueException();
 	}
 	
-	//TODO valores absurdos devem jogar exception
 	private static int getTemperatureScore(double temperature) {
-        if (temperature <= 35.0) {
+		if (temperature <= 35.0) {
             return 3;
         } else if (temperature <= 36.0) {
             return 1;
@@ -33,7 +50,7 @@ public class NewsScoreService {
     }
 
 	private static int getHeartRateScore(int heartRate) {
-        if (heartRate <= 40) {
+		if (heartRate <= 40) {
             return 3;
         } else if (heartRate <= 50) {
             return 1;
@@ -61,5 +78,47 @@ public class NewsScoreService {
             return 3;
         }
     }
+	
+	private static int getOxygenScore(String oxygen) {
+        if (oxygen.equalsIgnoreCase("air"))
+        	return 0;
+        if (oxygen.equalsIgnoreCase("oxygen"))
+        	return 2;
+        throw new InvalidVitalSignValueException();
+    }
+	
+	private static int getConsciousnessScore(String oxygen) {
+        if (oxygen.equalsIgnoreCase("alert"))
+        	return 0;
+        if (oxygen.equalsIgnoreCase("cvpu"))
+        	return 3;
+        throw new InvalidVitalSignValueException();
+    }
+	
+	private static int getRespirationRateScore(int respirationRate) {
+		if (respirationRate <= 8) 
+			return 3;
+		if (respirationRate >= 9 || respirationRate <= 11) 
+			return 1;
+		if (respirationRate >= 12 || respirationRate <= 20)
+			return 0;
+		if (respirationRate >= 21 || respirationRate <= 24)
+			return 2;
+		if (respirationRate <= 25) 
+			return 3;
+		throw new InvalidVitalSignValueException();
+	}
+	
+	private static int getSpo2Score(int spo2) {
+		if (spo2 <= 91) 
+			return 3;
+		if (spo2 == 92 || spo2 == 93) 
+			return 2;
+		if (spo2 == 94 || spo2 == 95) 
+			return 1;
+		if (spo2 >= 96)
+			return 0;
+		throw new InvalidVitalSignValueException();
+	}
 
 }
