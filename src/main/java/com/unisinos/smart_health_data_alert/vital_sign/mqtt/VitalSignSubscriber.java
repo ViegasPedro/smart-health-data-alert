@@ -37,15 +37,13 @@ public class VitalSignSubscriber implements IMqttMessageListener {
 		}
 
 		public void run() {
-			System.out.println("Thread [ " + Thread.currentThread().getName() + "], Topic[ " + topic + "],  Message ["
-					+ message + "] ");
 			Gson gson = new GsonBuilder()
 					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
 					.create();
 			
 			JSONObject json =new JSONObject(new String(message.getPayload()));
 			VitalSign vitalSign = gson.fromJson(json.toString(), VitalSign.class);
-						
+			
 			vitalSignService.processMessage(vitalSign);
 		}
 	}

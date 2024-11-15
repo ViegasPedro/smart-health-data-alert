@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Component
-public class FogServerPublisher {
+public class MqttPublisher {
 	
 	private MqttClient client;
 	
@@ -31,6 +31,6 @@ public class FogServerPublisher {
 				
     	MqttMessage mqttMessage = new MqttMessage(json.getBytes());
 		
-		client.getFogServerClient().publish(topic, mqttMessage);	
+		client.getClient().publish(topic, mqttMessage);	
 	}
 }

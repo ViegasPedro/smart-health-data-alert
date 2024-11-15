@@ -7,10 +7,11 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.unisinos.smart_health_data_alert.alert.service.AlertService;
-import com.unisinos.smart_health_data_alert.commons.mqtt.FogServerPublisher;
+import com.unisinos.smart_health_data_alert.commons.mqtt.MqttPublisher;
 import com.unisinos.smart_health_data_alert.commons.mqtt.MqttTopicUtils;
 import com.unisinos.smart_health_data_alert.news2.NewsScoreService;
 import com.unisinos.smart_health_data_alert.vital_sign.model.InvalidVitalSignValueException;
@@ -31,23 +32,26 @@ public class VitalSignService {
 	private AlertService alertService;
 	
 	@Autowired
-	private FogServerPublisher publisher;
+	private MqttPublisher publisher;
 
 	@Transactional
 	public void processMessage(VitalSign vitalSign) {
 		try {
+			if (!StringUtils.hasLength(vitalSign.getValue()))
+				throw new InvalidVitalSignValueException();
+			
 			int newsScore = NewsScoreService.calculateNewsScore(vitalSign);
 			vitalSign.setNewsScore(newsScore);
 
-			// deletes the old value of this vital sign stored in the database
+			//deletes the old value of this vital sign stored in the database
 			this.repository.deleteBySensorIdAndType(vitalSign.getSensorId(), vitalSign.getType());
 
 			//process vital sign and trigger alerts if necessary
 			if (newsScore > NewsScoreService.NORMAL_SCORE) {
-				handleVitalSignWithAbnormalScore(vitalSign);
+				this.handleVitalSignWithAbnormalScore(vitalSign);
 			}
 			//send the vital sign to fog server
-			publisher.publish(MqttTopicUtils.FOG_VITAL_SIGN_TOPIC, vitalSign);
+			this.publisher.publish(MqttTopicUtils.FOG_VITAL_SIGN_TOPIC, vitalSign);
 		
 		} catch (InvalidVitalSignValueException e) {
 			log.error("Ignoring invalid vital sign value");
@@ -55,14 +59,6 @@ public class VitalSignService {
 			log.error("Error sending alert. {}", e.getLocalizedMessage());
 			e.printStackTrace();
 		}
-	}
-
-	private int calculateUserTotalNewsScore(List<VitalSign> vitalSigns) {
-		int totalScore = 0;
-		for (VitalSign vitalSign : vitalSigns) {
-			totalScore += vitalSign.getNewsScore();
-		}
-		return totalScore;
 	}
 	
     private void handleVitalSignWithAbnormalScore(VitalSign vitalSign) throws JsonProcessingException, MqttPersistenceException, MqttException {
@@ -82,4 +78,12 @@ public class VitalSignService {
             alertService.sendMultiVitalSignAlert(vitalSigns);
         }
     }
+    
+    private int calculateUserTotalNewsScore(List<VitalSign> vitalSigns) {
+		int totalScore = 0;
+		for (VitalSign vitalSign : vitalSigns) {
+			totalScore += vitalSign.getNewsScore();
+		}
+		return totalScore;
+	}
 }

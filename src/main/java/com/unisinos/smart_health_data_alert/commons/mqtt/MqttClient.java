@@ -18,14 +18,7 @@ public class MqttClient {
 	private VitalSignSubscriber subscriber;
 	
 	private MqttAsyncClient client = null;
-	private MqttAsyncClient fogServerClient = null;
-	
-	public MqttAsyncClient getFogServerClient() {
-		if (fogServerClient == null || !fogServerClient.isConnected())
-			connectFogServer();
-		return fogServerClient;
-	}
-	
+		
 	public MqttAsyncClient getClient() {
 		if (client == null)
 			connect();
@@ -38,6 +31,7 @@ public class MqttClient {
         options.setPassword(this.properties.getMqtt().getPassword().toCharArray());
         options.setCleanSession(true);
         options.setKeepAliveInterval(30);
+        options.setMaxInflight(30);
         
         try {
             MqttAsyncClient client = new MqttAsyncClient(this.properties.getMqtt().getServerUrl(), this.properties.getMqtt().getClientId());
@@ -49,27 +43,6 @@ public class MqttClient {
             	client.subscribe(MqttTopicUtils.EDGE_VITAL_SIGN_TOPIC, 1, subscriber);
             }
             this.client = client;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-	}
-	
-	private void connectFogServer() {
-		MqttConnectOptions options = new MqttConnectOptions();
-    	options.setUserName(this.properties.getFogServer().getMqtt().getUser());
-        options.setPassword(this.properties.getFogServer().getMqtt().getPassword().toCharArray());
-        options.setCleanSession(true);
-        options.setKeepAliveInterval(30);
-        options.setMaxInflight(1000);
-        
-        try {
-            MqttAsyncClient client = new MqttAsyncClient(this.properties.getFogServer().getMqtt().getServerUrl(), 
-            		this.properties.getFogServer().getMqtt().getClientId());
-            client.connect(options);
-            
-            Thread.sleep(1000);
-            
-            this.fogServerClient = client;
         } catch (Exception e) {
             e.printStackTrace();
         }

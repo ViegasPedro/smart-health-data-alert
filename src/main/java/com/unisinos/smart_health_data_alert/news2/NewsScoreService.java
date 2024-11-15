@@ -2,37 +2,32 @@ package com.unisinos.smart_health_data_alert.news2;
 
 import com.unisinos.smart_health_data_alert.vital_sign.model.InvalidVitalSignValueException;
 import com.unisinos.smart_health_data_alert.vital_sign.model.VitalSign;
-import com.unisinos.smart_health_data_alert.vital_sign.model.VitalSignType;
 
 public class NewsScoreService {
 	
 	public static final int NORMAL_SCORE = 0;
 	public static final int SINGLE_SCORE_LIMIT = 3;
 	public static final int MULTI_SCORE_LIMIT = 5;
-	
+		
 	public static int calculateNewsScore(VitalSign vitalSign) {
-		if (vitalSign.getType() == VitalSignType.TEMPERATURE) {
-			return getTemperatureScore(Double.valueOf(vitalSign.getValue()));
-		}
-		if (vitalSign.getType() == VitalSignType.HEARTRATE) {
-			return getHeartRateScore(Integer.valueOf(vitalSign.getValue()));
-		}
-		if (vitalSign.getType() == VitalSignType.BLOODPRESSURE) {
-			return getBloodPressureScore(Integer.valueOf(vitalSign.getValue()));
-		}
-		if (vitalSign.getType() == VitalSignType.OXYGEN) {
-			return getOxygenScore(vitalSign.getValue());
-		}
-		if (vitalSign.getType() == VitalSignType.CONSCIOUSNESS) {
-			return getConsciousnessScore(vitalSign.getValue());
-		}
-		if (vitalSign.getType() == VitalSignType.RESPIRATIONRATE) {
-			return getRespirationRateScore(Integer.valueOf(vitalSign.getValue()));
-		}
-		if (vitalSign.getType() == VitalSignType.SPO2) {
-			return getSpo2Score(Integer.valueOf(vitalSign.getValue()));
-		}
-		throw new InvalidVitalSignValueException();
+	    switch (vitalSign.getType()) {
+	        case TEMPERATURE:
+	            return getTemperatureScore(Double.valueOf(vitalSign.getValue()));
+	        case HEARTRATE:
+	            return getHeartRateScore(Integer.valueOf(vitalSign.getValue()));
+	        case BLOODPRESSURE:
+	            return getBloodPressureScore(Integer.valueOf(vitalSign.getValue()));
+	        case OXYGEN:
+	            return getOxygenScore(vitalSign.getValue());
+	        case CONSCIOUSNESS:
+	            return getConsciousnessScore(vitalSign.getValue());
+	        case RESPIRATIONRATE:
+	            return getRespirationRateScore(Integer.valueOf(vitalSign.getValue()));
+	        case SPO2:
+	            return getSpo2Score(Integer.valueOf(vitalSign.getValue()));
+	        default:
+	            throw new InvalidVitalSignValueException();
+	    }
 	}
 	
 	private static int getTemperatureScore(double temperature) {
